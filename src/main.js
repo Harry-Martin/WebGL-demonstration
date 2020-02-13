@@ -1,5 +1,4 @@
-import VertexShader from './vertex_shader.js';
-import FragmentShader from './fragment_shader.js';
+import ShaderProgram from './shader_program.js';
 
 function main() {
   /** @type {HTMLCanvasElement} */
@@ -13,7 +12,9 @@ function main() {
     console.error('Unable to get WebGL2 Context');
     return -1;
   }
-  const vs = new VertexShader(gl, `\
+
+  const sp = new ShaderProgram(gl,
+    `\
 #version 300 es
 
 in vec4 a_position;
@@ -21,19 +22,18 @@ in vec4 a_position;
 void main() {
   gl_Position = a_position;
 }
-  `);
+`,
+    `\
+#version 300 es
 
-  const fs = new FragmentShader(gl, `\
-  #version 300 es
+precision mediump float;
 
-  precision mediump float;
+out vec4 outColor;
 
-  out vec4 outColor;
-
-  void main(){
-    outColor = vec4(1, 0, 0, 1);
-  }
-  `);
+void main(){
+  outColor = vec4(1, 0, 0, 1);
+}
+`);
 
   return 0;
 }
