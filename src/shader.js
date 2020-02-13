@@ -1,7 +1,7 @@
 
 class Shader {
   /**
-   *
+   * Represents an OpenGL Shader object
    * @param {WebGL2RenderingContext} gl OpenGL context
    * @param {String} src Shader source code
    * @param {number} type Shader type  (gl.VERTEX_SHADER | gl.FRAGMENT_SHADER)
@@ -12,7 +12,7 @@ class Shader {
   }
 
   /**
-   *
+   * Compiles the Shader
    * @param {WebGL2RenderingContext} gl OpenGL context
    * @param {String} src  Shader source code
    */
@@ -25,4 +25,5 @@ class Shader {
     }
   }
 }
+/** @export Shader */
 export { Shader as default };
