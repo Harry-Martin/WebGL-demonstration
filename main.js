@@ -5,8 +5,6 @@ function main() {
   /** @type {HTMLCanvasElement} */
   const canvas = document.getElementById('glContext');
 
-  document.querySelector('body').appendChild(canvas);
-
   /** @type {WebGL2RenderingContext} */
   const gl = canvas.getContext('webgl2');
 
