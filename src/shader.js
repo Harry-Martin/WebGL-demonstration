@@ -21,7 +21,7 @@ class Shader {
     gl.compileShader(this.id);
     const success = gl.getShaderParameter(this.id, gl.COMPILE_STATUS);
     if (!success) {
-      console.error(gl.getShaderInfoLog(this.id));
+      throw new Error(gl.getShaderInfoLog(this.id));
     }
   }
 }
