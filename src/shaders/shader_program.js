@@ -17,12 +17,12 @@ class ShaderProgram {
    * @param {String} vsPath - Path to vertex shader source code
    * @param {String} fsPath - Path to fragment shader source code
    */
-  static async createShaderProgram(gl, vsPath, fsPath) {
+  static async createShaderProgram(gl, path) {
     const id = gl.createProgram();
 
     /** fetch shader source from files in src/shaders/ */
-    const vsFile = await fetch(`src/shaders/${vsPath}`);
-    const fsFile = await fetch(`src/shaders/${fsPath}`);
+    const vsFile = await fetch(`src/shaders/${path}.vert`);
+    const fsFile = await fetch(`src/shaders/${path}.frag`);
     const vsSource = await vsFile.text();
     const fsSource = await fsFile.text();
 
