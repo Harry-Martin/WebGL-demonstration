@@ -9,7 +9,7 @@ async function sourceFromFile(filename) {
   return source;
 }
 
-function main() {
+async function main() {
   const canvas = document.getElementById('glContext');
 
   /** @type {WebGL2RenderingContext} */
@@ -21,9 +21,12 @@ function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
+  // const vertSource = await sourceFromFile('simple.vert');
+  // const simpSource = await sourceFromFile('simple.frag');
+  // console.log(vertSource);
   const sp = new ShaderProgram(gl,
-    this.sourceFromFile('simple.vert'),
-    this.sourceFromFile('simple.frag'));
+    await sourceFromFile('simple.vert'),
+    await sourceFromFile('simple.frag'));
 
   const positions = [
     0.0, 0.5, 0.0,
