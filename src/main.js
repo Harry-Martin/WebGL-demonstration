@@ -3,6 +3,12 @@ import VertexArray from './buffers/vertex_array.js';
 import IndexBuffer from './buffers/index_buffer.js';
 import Renderer from './renderer/renderer.js';
 
+async function sourceFromFile(filename) {
+  const file = await fetch(`./src/shaders/${filename}`);
+  const source = await file.text();
+  return source;
+}
+
 function main() {
   const canvas = document.getElementById('glContext');
 
@@ -15,26 +21,9 @@ function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  const sp = new ShaderProgram(gl, `\
-#version 300 es
-
-layout(location = 1) in vec4 a_position;
-
-void main() {
-  gl_Position = a_position;
-}`,
-  `\
-#version 300 es
-
-precision mediump float;
-
-out vec4 outColor;
-
-void main(){
-  outColor = vec4(1, 0, 0, 1);
-}
-
-`);
+  const sp = new ShaderProgram(gl,
+    this.sourceFromFile('simple.vert'),
+    this.sourceFromFile('simple.frag'));
 
   const positions = [
     0.0, 0.5, 0.0,
