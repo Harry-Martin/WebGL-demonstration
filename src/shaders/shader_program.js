@@ -7,8 +7,9 @@ class ShaderProgram {
    * @param {String} vsPath - Path to vertex shader source code
    * @param {String} fsPath - Path to fragment shader source code
    */
-  constructor(gl, vsPath, fsPath) {
-    this.id = ShaderProgram.createShaderProgram(gl, vsPath, fsPath);
+  constructor(gl, vsSource, fsSource) {
+    this.id = gl.createProgram();
+    this.linkShaderProgram(gl, vsSource, fsSource);
   }
 
   /**
@@ -17,27 +18,22 @@ class ShaderProgram {
    * @param {String} vsPath - Path to vertex shader source code
    * @param {String} fsPath - Path to fragment shader source code
    */
-  static async createShaderProgram(gl, path) {
-    const id = gl.createProgram();
+  linkShaderProgram(gl, vsSource, fsSource) {
+    /** fetch shader source */
 
-    /** fetch shader source from files in src/shaders/ */
-    const vsFile = await fetch(`src/shaders/${path}.vert`);
-    const fsFile = await fetch(`src/shaders/${path}.frag`);
-    const vsSource = await vsFile.text();
-    const fsSource = await fsFile.text();
-
-    const fs = new FragmentShader(gl, fsSource);
+    /** compile shaders */
     const vs = new VertexShader(gl, vsSource);
+    const fs = new FragmentShader(gl, fsSource);
 
-    gl.attachShader(id, fs.id);
-    gl.attachShader(id, vs.id);
-    gl.linkProgram(id);
+    /** link shaders */
+    gl.attachShader(this.id, vs.id);
+    gl.attachShader(this.id, fs.id);
+    gl.linkProgram(this.id);
 
-    const success = gl.getProgramParameter(id, gl.LINK_STATUS);
+    const success = gl.getProgramParameter(this.id, gl.LINK_STATUS);
     if (!success) {
-      throw new Error(gl.getProgramInfoLog(id));
+      throw new Error(gl.getProgramInfoLog(this.id));
     }
-    return id;
   }
 }
 /** @export ShaderProgram */
