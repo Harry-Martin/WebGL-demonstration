@@ -10,8 +10,10 @@ function use(gl, sp) {
  * @param {WebGL2RenderingContext} gl
  * @param {VertexArray} vao
  * @param {IndexBuffer} ibo
+ * @param {ShaderProgram} sp
+ * @param {Object} uniformData
  */
-function draw(gl, vao, ibo) {
+function draw(gl, vao, ibo, sp, uniformData) {
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 

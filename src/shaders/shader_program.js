@@ -7,7 +7,7 @@ class ShaderProgram {
    * @param {String} vsPath - Path to vertex shader source code
    * @param {String} fsPath - Path to fragment shader source code
    */
-  constructor(gl, vsSource, fsSource) {
+  constructor(gl, vsSource, fsSource, uniforms) {
     this.id = gl.createProgram();
     this.linkShaderProgram(gl, vsSource, fsSource);
   }
@@ -35,6 +35,13 @@ class ShaderProgram {
       throw new Error(gl.getProgramInfoLog(this.id));
     }
   }
+
+  /**
+   * 
+   * @param {WebGL2RenderingContext} gl 
+   * @param {Array} uniforms contains arrays of uniforms of each type
+   */
+
 }
 /** @export ShaderProgram */
 export { ShaderProgram as default };

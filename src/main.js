@@ -1,3 +1,4 @@
+
 import ShaderProgram from './shaders/shader_program.js';
 import VertexArray from './buffers/vertex_array.js';
 import IndexBuffer from './buffers/index_buffer.js';
@@ -21,9 +22,13 @@ async function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // const vertSource = await sourceFromFile('simple.vert');
-  // const simpSource = await sourceFromFile('simple.frag');
-  // console.log(vertSource);
+  let translation = [0.5,-0.5,0];
+  const uniforms = {
+    uniform3f: {
+      u_translation : translation,
+    }
+  }
+
   const sp = new ShaderProgram(gl,
     await sourceFromFile('simple.vert'),
     await sourceFromFile('simple.frag'));
@@ -53,8 +58,24 @@ async function main() {
   }]);
 
   const ibo = new IndexBuffer(gl, indices);
-  
+
   Renderer.use(gl, sp);
+
+  /*============================================================*/
+  /*TODO: pass uniforms to shader program
+            have shader program get the locations for each uniform and store an array of {uniformName: location}
+          pass uniforms to renderer.draw()
+            have draw() iterate over uniform types,
+              switch(type)
+              for each type, call a function which iterates over each uniform name,
+                looks up location for each name and sends data to that location*/
+  const [[type, uniform]] = Object.entries(uniforms);
+  const [[uniformName, uniformData]] = Object.entries(uniform);
+
+  const uniformLocation = gl.getUniformLocation(sp.id, uniformName);
+  gl.uniform3fv(uniformLocation, new Float32Array(uniformData));
+  /*============================================================*/
+
   Renderer.draw(gl, vao, ibo);
 
   /* ======== SETUP TIME ==========
