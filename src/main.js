@@ -1,8 +1,12 @@
+/* eslint-disable indent */
+/* eslint-disable no-multi-spaces */
 
 import ShaderProgram from './shaders/shader_program.js';
 import VertexArray from './buffers/vertex_array.js';
 import IndexBuffer from './buffers/index_buffer.js';
 import Renderer from './renderer/renderer.js';
+import { glMatrix, mat4 } from './libraries/gl-matrix/index.js';
+
 
 async function sourceFromFile(filename) {
   const file = await fetch(`./src/shaders/${filename}`);
@@ -22,10 +26,19 @@ async function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  const translation = [0, -0.5, 0];
+  const ortho = mat4.create();
+  mat4.ortho(ortho, -1, 1, -1, 1, -1, 1);
+
+  const model = mat4.create();
+  mat4.identity(model);
+  mat4.translate(model, model, [0.0, 0.0, 0]);
+  mat4.rotateX(model, model, glMatrix.toRadian(0));
+
+
   const uniforms = {
-    uniform3f: {
-      u_translation: translation,
+    uniformMatrix4fv: {
+      u_ortho: ortho,
+      u_model: model,
     },
   };
 
@@ -35,35 +48,72 @@ async function main() {
     uniforms);
 
   const positions = [
-    0.0, 0.5, 0.0,
-    0.5, 0.0, 0.0,
-    -0.5, 0.0, 0.0,
-    0.0, -0.5, 0.0,
+    // front
+    -0.5,  0.5,  0.5,  // top left      0
+    -0.5, -0.5,  0.5,  // bottom left   1
+     0.5,  0.5,  0.5,  // top right     2
+     0.5, -0.5,  0.5, // bottom right   3
+
+     // back
+     -0.5,  0.5,  -0.5,  // top left    4
+     -0.5, -0.5,  -0.5,  // bottom left 5
+      0.5,  0.5,  -0.5,  // top right   6
+      0.5, -0.5,  -0.5, // bottom right 7
   ];
 
+  const colours = [
+
+    1, 0, 0, 1,
+    0, 1, 0, 1,
+    0, 0, 1, 1,
+    1, 1, 0, 1,
+
+    0, 1, 1, 1,
+    1, 0, 1, 1,
+    1, 1, 1, 1,
+    0, 0, 0, 1,
+    ];
+
   const indices = [
-    0, 1, 2,
-    2, 1, 3,
+    // front face
+    2, 0, 1,
+    1, 3, 2,
+    // back face
+    5, 4, 6,
+    6, 7, 5,
+    // left face
+    0, 4, 5,
+    5, 1, 0,
+    // right face
+    6, 2, 3,
+    3, 7, 6,
+    // top face
+    6, 4, 0,
+    0, 2, 6,
+    // bottom face
+    3, 1, 5,
+    5, 7, 3,
   ];
+
   const vao = new VertexArray(gl, [{
     attribLocation: 1,
     data: positions,
     size: 3, /** how many floats per vertex? */
+  },
+  {
+    attribLocation: 2,
+    data: colours,
+    size: 3,
   }]);
 
   const ibo = new IndexBuffer(gl, indices);
 
   Renderer.use(gl, sp);
+  gl.enable(gl.DEPTH_TEST);
 
-  let xvel = 0.01;
-  let yvel = 0.01;
   function loop() {
-    translation[0] += xvel;
-    translation[1] += yvel;
-    if (translation[0] > 0.5 || translation[0] < -0.5) xvel *= -1;
-    if (translation[1] > 0.5 || translation[1] < -0.5) yvel *= -1;
-
     Renderer.draw(gl, vao, ibo, sp, uniforms);
+    mat4.rotate(model, model, glMatrix.toRadian(2), [1, 0.5, 0.2]);
     requestAnimationFrame(loop);
   }
 

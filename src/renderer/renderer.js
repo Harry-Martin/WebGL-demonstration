@@ -16,6 +16,7 @@ function use(gl, sp) {
 function draw(gl, vao, ibo, sp, uniforms) {
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
 
   gl.bindVertexArray(vao.id);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo.id);
@@ -32,7 +33,9 @@ function draw(gl, vao, ibo, sp, uniforms) {
         case 'uniform3f':
           gl.uniform3fv(location, new Float32Array(data));
           break;
-
+        case 'uniformMatrix4fv':
+          gl.uniformMatrix4fv(location, false, new Float32Array(data));
+          break;
         default:
           break;
       }
