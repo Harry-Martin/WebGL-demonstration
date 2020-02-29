@@ -26,18 +26,22 @@ async function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  const ortho = mat4.create();
-  mat4.ortho(ortho, -1, 1, -1, 1, -1, 1);
+  const perspective = mat4.create();
+  mat4.perspective(perspective, glMatrix.toRadian(90), 1, 0.1, 100);
+  //mat4.ortho(perspective, -1, 1, -1, 1, 0, 100);  <--- orphographic perspective
+
 
   const model = mat4.create();
   mat4.identity(model);
-  mat4.translate(model, model, [0.0, 0.0, 0]);
-  mat4.rotateX(model, model, glMatrix.toRadian(0));
+  mat4.scale(model, model, [1, 1, 1]);
+
+  const view = mat4.create();
 
 
   const uniforms = {
     uniformMatrix4fv: {
-      u_ortho: ortho,
+      u_perspective: perspective,
+      u_view: view,
       u_model: model,
     },
   };
@@ -111,9 +115,13 @@ async function main() {
   Renderer.use(gl, sp);
   gl.enable(gl.DEPTH_TEST);
 
+  let z = 1;
   function loop() {
+    z += 0.01;
+    mat4.rotate(model, model, glMatrix.toRadian(2), [0.5, 1, 0]);
+    mat4.lookAt(view, [0, 0, z], [0, 0, -1], [0, 1, 0]); // moving the camera backwards (positive z direction)
+
     Renderer.draw(gl, vao, ibo, sp, uniforms);
-    mat4.rotate(model, model, glMatrix.toRadian(2), [1, 0.5, 0.2]);
     requestAnimationFrame(loop);
   }
 
