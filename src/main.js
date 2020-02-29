@@ -22,34 +22,28 @@ async function main() {
 
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  let translation = [0.5,-0.5,0];
+  const translation = [0, -0.5, 0];
   const uniforms = {
     uniform3f: {
-      u_translation : translation,
-    }
-  }
+      u_translation: translation,
+    },
+  };
 
   const sp = new ShaderProgram(gl,
     await sourceFromFile('simple.vert'),
-    await sourceFromFile('simple.frag'));
+    await sourceFromFile('simple.frag'),
+    uniforms);
 
   const positions = [
     0.0, 0.5, 0.0,
     0.5, 0.0, 0.0,
     -0.5, 0.0, 0.0,
     0.0, -0.5, 0.0,
-
-    0.0 + 0.2, 0.5, 0.0,
-    0.5 + 0.2, 0.0, 0.0,
-    -0.5 + 0.2, 0.0, 0.0,
-    0.0 + 0.2, -0.5, 0.0,
   ];
 
   const indices = [
     0, 1, 2,
     2, 1, 3,
-    4, 5, 6,
-    6, 5, 7,
   ];
   const vao = new VertexArray(gl, [{
     attribLocation: 1,
@@ -61,46 +55,20 @@ async function main() {
 
   Renderer.use(gl, sp);
 
-  /*============================================================*/
-  /*TODO: pass uniforms to shader program
-            have shader program get the locations for each uniform and store an array of {uniformName: location}
-          pass uniforms to renderer.draw()
-            have draw() iterate over uniform types,
-              switch(type)
-              for each type, call a function which iterates over each uniform name,
-                looks up location for each name and sends data to that location*/
-  const [[type, uniform]] = Object.entries(uniforms);
-  const [[uniformName, uniformData]] = Object.entries(uniform);
+  let xvel = 0.01;
+  let yvel = 0.01;
+  function loop() {
+    translation[0] += xvel;
+    translation[1] += yvel;
+    if (translation[0] > 0.5 || translation[0] < -0.5) xvel *= -1;
+    if (translation[1] > 0.5 || translation[1] < -0.5) yvel *= -1;
 
-  const uniformLocation = gl.getUniformLocation(sp.id, uniformName);
-  gl.uniform3fv(uniformLocation, new Float32Array(uniformData));
-  /*============================================================*/
+    Renderer.draw(gl, vao, ibo, sp, uniforms);
+    requestAnimationFrame(loop);
+  }
 
-  Renderer.draw(gl, vao, ibo);
-
-  /* ======== SETUP TIME ==========
-    create shader program
-      -create vertex shader
-        -compile shader
-      -create fragment shader
-        -compile shader
-      -link program
-    create vao
-    bind vao
-    create vbos
-      -> for each vbo
-        bind vbo
-        bufferData
-        setup attribPointer
-
- /* ========= RENDER TIME ==========
-  - clear
-  - bind vao (select collection of buffers needed to draw)
-  - enable all attribs for the vao (enable each of the buffers)
-  - bind ibo (describe how to read data about 1 vertex)
-  - use program
-  - draw elements
-  */
+  requestAnimationFrame(loop);
 }
+
 
 window.onload = main();
